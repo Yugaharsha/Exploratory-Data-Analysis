@@ -1,0 +1,134 @@
+data<-read.csv("SalesData.csv")
+//Data Examination
+a.	Check the Names and Data Types of Variables (Columns)
+•	Identify and list the names and data types of all variables in the dataset.
+>colnames(data)
+
+>	str(data)
+
+ 
+
+//•	List these variables and explain why they are not useful.
+//As it might have constant values for all data values or it might been a ID
+
+
+//c.	Identify Variables with Missing Data
+//Identify and list the variables that contain missing data.
+>	missing_var_count <- colSums(is.na(data))
+>	var_name<-names(data)[missing_var_count>0]
+>	count<-missing_var_count[missing_var_count>0]
+>	paste(var_name, count, sep= " : ")
+
+
+
+//Data Imputation
+//a.	Delete All Rows with Missing Data
+//•	Create a new dataset, S1, by removing all rows with missing data.
+>	S1 <-na.omit(data)
+>	print(S1)
+
+b.	Replace Missing Values with the Mean Value of Each Variable
+•	Impute missing values by replacing them with the mean value of each respective variable.
+>	data<-read.csv("SalesData.csv")
+ 
+>	print(data)
+Order.Date Order.Priority Order.Quantity	Sales	Ship.Mode Profit
+
+1 10/13/2010	Low	NA 261.5400 Regular Air -213.25
+2 10-01-2012	High	49 10123.0200 Delivery Truck 457.81
+3 10-01-2012	High	27 244.5700 Regular Air   46.71
+>	for(col in names(data)) {
++ if(is.numeric(data[[col]])) {
++	data[[col]][is.na(data[[col]])] <- round(mean(data[[col]], na.rm = TRUE))
++ }
++ }
+>	print(data) # 1st row
+
+
+
+//c.	Replace Missing Values with Random Values
+//•	Replace missing values with random values between the minimum and maximum of each variable.
+>	print(data)
+Order.Date Order.Priority Order.Quantity	Sales	Ship.Mode Profit
+
+1 10/13/2010	Low	NA 261.5400 Regular Air -213.25
+2 10-01-2012	High	49 10123.0200 Delivery Truck 457.81
+>	for(col in names(data)) {
++ if(is.numeric(data[[col]])) {
++	data[[col]][is.na(data[[col]])] <- round(runif(n=sum(is.na(data[[col]])),
++	min = min(data[[col]],na.rm=TRUE),
++	max= max(data[[col]],na.rm=TRUE)))
++ }
++ }
+>	print(data)
+ 
+
+
+
+//d.	Replace Missing Values for Categorical Variables
+//•	For categorical variables, replace missing values with a random value from each respective variable.
+>	data3 <- read.csv('SalesData.csv',stringsAsFactors = TRUE)
+>
+>	for (col in names(data3)) {
++ if (is.factor(data3[[col]])) {
++	missing_indices <- is.na(data3[[col]])
++	if (any(missing_indices)) {
++	data3[[col]][missing_indices] <- sample(levels(data3[[col]]),
++	size = sum(missing_indices),
++	replace = TRUE)
++	}
++ }
++ }
+>	print(data3)
+
+
+Data Exploration
+//a.	Draw a boxplot for each numeric variable. Which variable(s) shows outliers exist? for(col in names(data)) {
+if(is.numeric(data[[col]])) {
+boxplot(data[[col]], main = paste("Boxplot of", col), ylab = col) Sys.sleep(1)
+}
+}
+ 
+ 	 
+//b.	Use any method to identify any outlier/wrong value in Order Priority column. Explain your method.
+>	unique(data$Order.Priority)
+
+>	expec_priorities <- c("Low", "Medium", "High", "Critical", "Not Specified")
+>	setdiff(unique(data$Order.Priority), expec_priorities)
+[1] NA	"Loww"
+//c.	Construct a distribution table by R function table() for Order Priority and Product category two categorical variables. Make comments on the results you get.
+>	distr_table <- table(data$Order.Priority, data$Product.Category)
+>	distr_table
+Furniture Office Supplies Technology
+
+
+//d.	Examine the distribution of all numeric variables using histograms. Make comments on the results you obtain.
+>	numeric_vars <- names(data)[sapply(data, is.numeric)]
+>	for (col in numeric_vars) {
++ hist(data[[col]], main=paste("Histogram of", col), xlab=col)
++ Sys.sleep(1)
++ }
+
+
+//f. Standardize All Numeric Variables Standardize the numeric variables using:
+(i)	Z-scores.
+>	print("Z-Scores")
+[1] "Z-Scores"
+>	for(col in names(data)) {
++ if(is.numeric(data[[col]])) {
++	data[[col]] <- scale(data[[col]], center = TRUE, scale = TRUE)
++ }
++ }
+>	summary(data) # check mean & sd
+
+
+(ii)	Min-max normalization
+>	print("Min-Max Normalisation")
+[1] "Min-Max Normalisation"
+>	for(col in names(data)) {
++ if(is.numeric(data[[col]])) {
++   data[[col]] <- (data[[col]] - min(data[[col]])) /
++     (max(data[[col]]) - min(data[[col]]))
++ }
++ }
+>	summary(data) #check range
